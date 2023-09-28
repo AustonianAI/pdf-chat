@@ -1,6 +1,7 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
 import { Inbox, Loader2 } from "lucide-react"
@@ -10,6 +11,8 @@ import toast from "react-hot-toast"
 import { uploadToS3 } from "@/lib/s3"
 
 const FileUpload = () => {
+  const router = useRouter()
+
   const [uploading, setUploading] = React.useState(false)
 
   const { mutate, isLoading } = useMutation({
@@ -50,12 +53,13 @@ const FileUpload = () => {
         }
 
         mutate(data, {
-          onSuccess: (data) => {
-            console.log(data)
-            // toast.success(data.message)
+          onSuccess: ({ chat_id }) => {
+            toast.success("Chat created successfully")
+            router.push(`/chat/${chat_id}`)
           },
           onError: (error) => {
             toast.error("Error creating chat")
+            console.error(error)
           },
         })
       } catch (error) {
